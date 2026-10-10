@@ -13,19 +13,81 @@
   }
 }
 
-.App-header {
+.App{
+  text-align: center;
   background-color: #282c34;
   min-height: 100vh;
+  /*font-size: calc(1 *(10px + 2vmin));*/
+
+}
+
+.App-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: Center;
+  justify-content: flex-start;
+  font-size: 4rem;
   color: white;
+  /*padding: 2rem;*/
+}
+.App-header__title {
+  /*font-size: calc(1*(10px + 2vmin));*/
+  align-items: flex-start;
+  padding: 4rem;
+}
+.App-header__subtitle{
+  font-size: calc(1*(10px + 2vmin));
+}
+
+.DiceTable {
+  background-color: #282c34;
+  /*min-height: 100vh;*/
+  display: flex;
+  color: white;
+  font-size: calc(1 * (10px + 2vmin));
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.DiceTable__row{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap:12px
+}
+  /*align-items: flex-start;*/
+  /*padding: calc(4*(10px + 2vmin));*/
+/*}.App-content__diceTable__row{*/
+/*   align-items: flex-end ;*/
+/*   !*font-size: calc(100rem);*!*/
+/*   flex-direction: column;*/
+/*}.App-content__diceTable__row__label{*/
+/*  flex-direction: column;*/
+/*}.App-content__diceTable__row__button{*/
+/*   flex-direction: column;*/
+
+.Results{
+  display: flex;
+  flex-direction: column;
+  align-items: Center;
+  justify-content: flex-start;
+  font-size: calc(4rem);
+  color: white;
+  padding: 2rem;
+}
+.Results-header__title {
+  font-size: 3rem;
+  align-items: flex-start;
+  padding: 1rem;
+}
+.Results-header__subtitle{
+  font-size: 2rem;
 }
 
 .App-link {
-  color: #61dafb;
+  /*color: #61dafb;*/ /*old color*/
+  color: #20c820;
+
 }
 
 @keyframes App-logo-spin {
