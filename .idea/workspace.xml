@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="972c9f0e-a03b-4b23-bf89-ed30c5112682" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +35,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "MultipleRolls",
+    "git-widget-placeholder": "main",
     "javascript.preferred.runtime.type.id": "node",
     "last_opened_file_path": "/home/ferrous/Documents/dieroller",
     "node.js.detected.package.eslint": "true",
@@ -79,7 +82,7 @@
       <workItem from="1791661559421" duration="14745000" />
       <workItem from="1791733108639" duration="10891000" />
       <workItem from="1791746147453" duration="6505000" />
-      <workItem from="1791753530657" duration="3551000" />
+      <workItem from="1791753530657" duration="4977000" />
     </task>
     <servers />
   </component>
