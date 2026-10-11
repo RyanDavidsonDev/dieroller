@@ -27,7 +27,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "JavaScript Debug.Debug Application.executor": "Run",
+    "JavaScript Debug.Debug Application.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -80,7 +80,7 @@
       <workItem from="1791661559421" duration="14745000" />
       <workItem from="1791733108639" duration="10891000" />
       <workItem from="1791746147453" duration="6505000" />
-      <workItem from="1791753530657" duration="1207000" />
+      <workItem from="1791753530657" duration="2721000" />
     </task>
     <servers />
   </component>

@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <header className="App-header__title">
-          Hello
+          Welcome
         </header>
         <header className="App-header__subtitle">
           Please click a button below to roll a die
@@ -28,10 +28,7 @@ function App() {
         </div>
       </div>
       <div className="Results">
-        {/*if (results?.allresults){*/}
         <DisplayResults results={results} ></DisplayResults>
-
-
       </div>
     </div>
   );
@@ -47,16 +44,15 @@ function App() {
           "\n not sure how this happened but something is definitely wrong.");
     }
 
-
+    //we only rolled one type of die
     if(results.resultsMap.size ===1){
-      //we only rolled one type of die
+
       let currentSideType :number = results.resultsMap.keys().next().value;
       let rollPoolOfCurrentSideType = results.resultsMap.get(currentSideType);
+
       if( rollPoolOfCurrentSideType ===undefined) {
         throw new Error("roll pool of current side types is invalid");
       }
-
-
       if(rollPoolOfCurrentSideType.length ===0){
         throw new Error("roll pool of current side type is valid, but empty");
 
@@ -66,9 +62,9 @@ function App() {
 
         ret =
             <div className="Results-Container">
-                                                                 {/*equivalent to allResults.keys()[0]. has to be done this way because keys() is an iterator  */}
+
               <header className="Results-header__subtitle">you  rolled a d{results.resultsMap.keys().next().value} and got:</header>
-              <header className="Results-header__title">
+              <header className="Results-header__title">        {/*^ equivalent to resultsMap.keys()[0]. has to be done this way because keys() is an iterator  */}
                 {results.resultsMap.values().next().value}
               </header>
             </div>
@@ -77,12 +73,9 @@ function App() {
       //###region MultipleOfSingleType
       } else {
         //we only rolled one type of die, but multiple of them
-
-        //I guess the best way to show this would be to sort the results in ascending order
-        //i.e. you rolled 3d8 and got: /n 3+5+6+8+8=30
         ret =
             <div className="Results-Container">
-              <header className="Results-header__subtitle">you  rolled {results.resultsMap.size}d{results.resultsMap.keys().next().value} and got:</header>
+              <header className="Results-header__subtitle">you  rolled {results.resultsMap.get(currentSideType)?.length}d{results.resultsMap.keys().next().value} and got:</header>
               <header className="Results-header__subtitle">{StringifyPool(rollPoolOfCurrentSideType)}</header>
               <header className="Results-header__subtitle">For a total of:</header>
               <header className="Results-header__title">{results.total}</header>
@@ -90,10 +83,7 @@ function App() {
               <header className="Results-header__subtitle">The lowest roll was {results.lowest}</header>
               <header className="Results-header__subtitle">The average was {results.average}</header>
               <header className="Results-header__subtitle"></header>
-
             </div>
-
-
       //###endregion
       }
 
@@ -121,35 +111,28 @@ function App() {
         <header className="Results-header__title">you rolled</header>
           <header className="Results-header__subtitle">
             {(results?.resultsMap?.size ===1 ? "a ":results?.resultsMap?.size.toString())
-                + "d" + (results?.resultsMap?.keys().next().value) + " and got at total of " + results?.total}
+                + "d" + ((results.resultsMap.get(results?.resultsMap?.keys().next().value))?.values()) + " and got at total of " + results?.total}
           </header>
       </div>
     //###endregion
     }
     return ret
   }
-
   //##endregion
-
 }
 
-
 function DiceRow({sides, onRoll} :{sides:number ; onRoll:(results:RollResults ) => void }): JSX.Element {
-// function DiceRow({sides, onRoll} :{sides:number ; onRoll:(results:RollResults ) => }) {}
-    // {sides}:{sides:number}, onRoll:(results:RollResults)=>{}){
-// function DiceRow({sides}:{sides:number}){
 
   const countRef: (RefObject<HTMLInputElement | null> |null )   = useRef<HTMLInputElement>(null);
-
 
   function handleRollMultiple(sides:number){
     let count:number = 0;
     if(countRef?.current?.value !== undefined){
       count = parseInt(countRef.current.value);
+      count = Math.max(1, count)
+      count = Math.min(70, count)
     }
     if(count !== 0){
-
-
 
       onRoll(rollDice(count, sides));
     }
@@ -168,7 +151,7 @@ function DiceRow({sides, onRoll} :{sides:number ; onRoll:(results:RollResults ) 
          <span className="diceTable__label" >
            or roll multiple
          </span>
-        <input ref={countRef} type={"number"} min={1} step={1} />
+        <input ref={countRef} type={"number"} min={1} max={70} step={1} />
         <button
             className="diceTable__button"
             //todo why is the counter resetting on button press?
@@ -180,7 +163,7 @@ function DiceRow({sides, onRoll} :{sides:number ; onRoll:(results:RollResults ) 
 //#endregion Visuals
 
 
-//#region Internals
+//#region Utils
 
 enum SortTypes{
   None="None",
@@ -228,8 +211,6 @@ function StringifyPool(pool: number[], sortBy: SortTypes = SortTypes.None){
   return finString
 }
 
-//TODO NEXT STEP is to do nice looking output (rather than terminal output)
-
 function _executeRoll(sides: number):number {
   const result: number = 1+ Math.floor(Math.random()*sides)
   console.log("you rolled a " +sides+ " sided die and the result is: " + result);
@@ -272,10 +253,8 @@ function rollDice(count:number, sides:number):RollResults{
     max = Math.min(max, rollResult);
     total += rollResult;
     RetMap.get(sides)?.push(rollResult)
-    // result[i-1] = _executeRoll(sides);
   }
 
-  //, _total:number, _highest:number, _lowest:number, _average:number) {
   const avg :number = total/count; //may need to +1?
   let result : RollResults = new RollResults(RetMap, total, max, min, avg);
   if(result === undefined){
