@@ -7,30 +7,51 @@ import './App.css';
 function App() {
   const [results, setResults] = useState<RollResults>();
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <header className="App-header__title">
-          Welcome
-        </header>
-        <header className="App-header__subtitle">
-          Please click a button below to roll a die
-        </header>
+  return (<>
+      <div className="App">
+        <header className="App-header">
+          <header className="App-header__title">
+            Welcome
+          </header>
+          <header className="App-header__subtitle">
+            Please click a button below to roll a die
+          </header>
 
-      </header>
-      <div className="DiceTable">
+        </header>
         <div className="DiceTable">
-          <DiceRow sides={6} onRoll={setResults}></DiceRow>
-          <DiceRow sides={8} onRoll={setResults}></DiceRow>
-          <DiceRow sides={10} onRoll={setResults}></DiceRow>
-          <DiceRow sides={12} onRoll={setResults}></DiceRow>
-          <DiceRow sides={20} onRoll={setResults}></DiceRow>
+          <div className="DiceTable">
+            <DiceRow sides={6} onRoll={setResults}></DiceRow>
+            <DiceRow sides={8} onRoll={setResults}></DiceRow>
+            <DiceRow sides={10} onRoll={setResults}></DiceRow>
+            <DiceRow sides={12} onRoll={setResults}></DiceRow>
+            <DiceRow sides={20} onRoll={setResults}></DiceRow>
+          </div>
+        </div>
+        <div className="Results">
+          <DisplayResults results={results} ></DisplayResults>
+        </div>
+        <div className="footer">
+          <span>
+             <a
+                className="App-link"
+                href={`${process.env.PUBLIC_URL}/credits.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+                >Credits
+            </a>
+          </span>
+          <span>
+            <a
+            className="App-link"
+            href="https://github.com/ryandavidsondev/dieroller"
+            rel="noopener noreferrer"
+            target="_blank"
+            >Github</a>
+
+          </span>
         </div>
       </div>
-      <div className="Results">
-        <DisplayResults results={results} ></DisplayResults>
-      </div>
-    </div>
+    </>
   );
 //##endregion
 //## region DisplayResults
@@ -79,10 +100,10 @@ function App() {
               <header className="Results-header__subtitle">{StringifyPool(rollPoolOfCurrentSideType)}</header>
               <header className="Results-header__subtitle">For a total of:</header>
               <header className="Results-header__title">{results.total}</header>
-              <header className="Results-header__subtitle">The highest roll was {results.highest}</header>
-              <header className="Results-header__subtitle">The lowest roll was {results.lowest}</header>
-              <header className="Results-header__subtitle">The average was {results.average}</header>
-              <header className="Results-header__subtitle"></header>
+              <header className="Results-moreResults">The highest roll was {results.highest}</header>
+              <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
+              <header className="Results-moreResults">The average was {results.average}</header>
+              <header className="Results-moreResults"></header>
             </div>
       //###endregion
       }
@@ -114,7 +135,9 @@ function App() {
                 + "d" + ((results.resultsMap.get(results?.resultsMap?.keys().next().value))?.values()) + " and got at total of " + results?.total}
           </header>
       </div>
+
     //###endregion
+
     }
     return ret
   }
@@ -129,6 +152,12 @@ function DiceRow({sides, onRoll} :{sides:number ; onRoll:(results:RollResults ) 
     let count:number = 0;
     if(countRef?.current?.value !== undefined){
       count = parseInt(countRef.current.value);
+      if(isNaN(count)){
+        count = 1;
+        //future dev I'll want to properly fork this logic. probably return early i
+        // if count is NaN. That'll allow me to step over each field and skip the ones
+        // that are empty. for now just turning an empty field should be fine
+      }
       count = Math.max(1, count)
       count = Math.min(70, count)
     }
@@ -243,14 +272,14 @@ function rollDice(count:number, sides:number):RollResults{
   // However, between those multiple layers of likelihood, one thing I know for CERTAIN is that none of this
   // is worth worrying about until I get the rest of the app working. so I'm gonna come back to this
 
-  let min:number = -1;
-  let max:number = 101;// I may add a d100, but otherwise no dice should ever roll higher than that
+  let min:number = 101;// I may add a d100, but otherwise no dice should ever roll higher than that
+  let max:number = -1;
   let total:number =0;
   console.log("rolling " + count + " dice with " + sides + " sides");
   for (let i:number = 0; i < count; i++) {
     let rollResult: number = _executeRoll(sides);
-    min = Math.max(max, rollResult);
-    max = Math.min(max, rollResult);
+    max = Math.max(max, rollResult);
+    min = Math.min(min, rollResult);
     total += rollResult;
     RetMap.get(sides)?.push(rollResult)
   }
