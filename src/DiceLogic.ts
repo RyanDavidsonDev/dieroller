@@ -58,7 +58,7 @@ export function processRolls(map: Map<number, number[]>) : RollResults{
     map.forEach((pool, key) => {
         if( pool === undefined){
             throw Error(`pool for key ${key} was undefined`)
-        } else if ( pool.length == 0){
+        } else if ( pool.length === 0){
             throw Error(`pool for key ${key} has no members`)
         }
 
@@ -98,7 +98,7 @@ export async function rollDice(count: number, sides: number): Promise<RollResult
 
     // console.log("rolling " + count + " dice with " + sides + " sides");
     const resArr : number[] |undefined = await generateNumbers(1, sides, count)
-    if( resArr != undefined ) {
+    if( resArr !== undefined ) {
         ResultsMap.set(sides, resArr);
         //could also maybe set and make ResMap a const again? todo experiment w that after async is working
         // Push( sides, resArr);
