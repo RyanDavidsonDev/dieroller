@@ -1,15 +1,20 @@
 # Hello, and welcome to Ryan Davidson's Die Roller.
-*(this version of the readme was written on October 11, 2026)*
+*(this version of the readme was written on October 11, 2026, with one 
+timestamped update having been added since then)*
 
 This is an app built with [Create React App](https://react.dev/) to be
 able to roll common dice used for Tabletop Roll Playing games, and, more
 importantly for me to learn TypeScript and React.
 
-Soon (hopefully tomorrow) I will also implement true
+Soon (hopefully tomorrow\*) I will also implement true
 random generation courtesy of [random.org](https://www.random.org/). This 
 is because it's just so much more satisfying for the 'dice to tell a story'
 when those dice are following real world input, rather than a computer
-algorithm 
+algorithm
+(\*update -monday Oct 12, I forgot to anticipate the fact that HTTPS calls have to be handled 
+with async requests. Which has turned into a whole rabbit hole as I learn how 
+java handles async code. Gonna try to revisit it tomorrow, when hopefully being 
+more directly focused on that ONE THING will help)
 
 
 if you happen to be from VVD, then hello! I'm astounded at how quickly 
