@@ -6,8 +6,7 @@ import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
 
 //##region App
 function App() {
-    const  [results, setResults] = useState<RollResults>();
-
+    const [results, setResults] = useState<RollResults>();
     return (
         <>
             <div className="App">
@@ -22,11 +21,13 @@ function App() {
                 </header>
                 <div className="DiceTable">
                     <div className="DiceTable">
+                        <DiceRow sides={4} onRoll={setResults}></DiceRow>
                         <DiceRow sides={6} onRoll={setResults}></DiceRow>
                         <DiceRow sides={8} onRoll={setResults}></DiceRow>
                         <DiceRow sides={10} onRoll={setResults}></DiceRow>
                         <DiceRow sides={12} onRoll={setResults}></DiceRow>
                         <DiceRow sides={20} onRoll={setResults}></DiceRow>
+                        <DiceRow sides={100} onRoll={setResults}></DiceRow>
                     </div>
                 </div>
                 <div className="Results">
@@ -54,10 +55,7 @@ function App() {
                 </div>
             </div>
         </>
-
-
     );
-
 //##endregion
 //## region DisplayResults
     function DisplayResults({results}: { results: RollResults | undefined }) {
@@ -152,7 +150,6 @@ function App() {
             //     </header>
             // </div>
             //
-            //###endregion
         }
         return ret
     }
