@@ -192,7 +192,7 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
             if (err instanceof Error){
                 console.error("failed to submit request: " + err.message);
             } else {
-                console.error("an unkown error ocurred: " + err)
+                console.error("an unknown error occurred: " + err)
             }
         }
 
@@ -206,7 +206,6 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
             <button
                 className="diceTable__button"
                 onClick={ () =>handleClickSingle({sides, onRoll})}>
-                {/*onClick={() => onRoll( handleClick())}>*/}
                 D{sides} </button>
             <span className="diceTable__label">
             or roll multiple
@@ -214,9 +213,7 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
             <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
             <button
                 className="diceTable__button"
-                //todo why is the counter resetting on button press?
                 onClick={ () =>handleClickMultiple(sides)}>
-                {/*onClick={() => handleRollMultiple(sides)}>*/}
                 roll multiple
             </button>
         </div>
