@@ -20,6 +20,10 @@ async function SubmitRequest(url:string):Promise<number[]> {
     return numsAsStrings.map(s => Number.parseInt(s.toString()));
 }
 
+// #cleanup do SubmitRequest and Generate numbers really need to be separate functions?
+//I think I originally split them because that was how it was done in one of the examples of async
+// programming that I was trying to follow. Might be easier to keep it split in case I need to
+// refactor my API calls in the future? not sure.
 
 export async function GenerateNumbers(min:number, max:number, count:number) {
     const url =

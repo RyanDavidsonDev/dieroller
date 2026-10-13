@@ -49,15 +49,53 @@ export function StringifyPool(pool: number[], sortBy: SortTypes = SortTypes.None
 
 //todo change this to just call rollDice(1, sides)? or maybe remove altogether?
 
-//takes an array of numbers and processes it into a clean RollResults object
-export function ProcessRolls(rolls: number[]) : RollResults{
 
+
+// takes a map of numbers and processes it into a clean RollResults object
+export function ProcessRolls(map: Map<number, number[]>) : RollResults{
+
+    let min: number = 101;// no dice should ever roll higher than a d100
+    let max: number = -1;
+    let total: number = 0;
+    let average: number = -1;
+    let rollResults: RollResults;
+
+
+    // for(let [key, pool] of map.entries()) {
+    map.forEach((pool, key) => {
+        if( pool === undefined){
+            throw Error(`pool for key ${key} was undefined`)
+        } else if ( pool.length == 0){
+            throw Error(`pool for key ${key} has no members`)
+        }
+
+        //defined outside the first loop cause why not, but need to be reset for each key
+        //actually maybe not? depends on whether we want these stats to be for the whole array
+        // or for each group of dice. the answer is probably both but either way that's a
+        // question to be revisited when I implement the ability to roll multiple types of dice
+        // which is to say - not right now.
+        // min = 101;
+        // max = -1;
+        // total = 0;
+        for (let i: number = 0; i < pool.length; i++) {
+
+            // let rollResult: number = _executeRoll(sides);
+            max = Math.max(max, pool[i]);
+            min = Math.min(min, pool[i]);
+            total += pool[i];
+        }
+
+        average = total / pool.length; //may need to +1?
+    });
+
+    // rollResults :RollResults = new RollResults(map, total, max, min, average);
+    return new RollResults(map, total, max, min, average);
 }
 
 //todo refactor this for the new hashmap, also add version that can do multiple die types
-export function rollDice(count: number, sides: number): RollResults {
+export async function rollDice(count: number, sides: number): Promise<RollResults> {
     // let result: number[] = Array(9).fill(0);
-    let RetMap: Map<number, number[]> = new Map<number, number[]>([[sides, []]]);
+    let ResultsMap: Map<number, number[]> = new Map<number, number[]>([[sides, []]]);
 
     //if I want to sort, this stackoverflow post seems a good way to efficiently insert the roll result
     //https://stackoverflow.com/a/21822316
@@ -68,50 +106,47 @@ export function rollDice(count: number, sides: number): RollResults {
     // However, between those multiple layers of likelihood, one thing I know for CERTAIN is that none of this
     // is worth worrying about until I get the rest of the app working. so I'm gonna come back to this
 
-    let min: number = 101;// I may add a d100, but otherwise no dice should ever roll higher than that
-    let max: number = -1;
-    let total: number = 0;
     console.log("rolling " + count + " dice with " + sides + " sides");
-    _executeRolls(count, sides)
-    //
-    // for (let i: number = 0; i < count; i++) {
-    //     let rollResult: number = _executeRoll(sides);
-    //     max = Math.max(max, rollResult);
-    //     min = Math.min(min, rollResult);
-    //     total += rollResult;
-    //     RetMap.get(sides)?.push(rollResult)
-    // }
+    const resArr : number[] |undefined = await GenerateNumbers(1, sides, count)
+    if( resArr != undefined ) {
+        ResultsMap = new Map<number, number[]>([[sides, resArr]]);
+        //could also maybe set and make ResMap a const again? todo experiment w that after async is working
+        // Push( sides, resArr);
+    } else {
+        console.error("resArr is not defined");
+    }
 
-    const avg: number = total / count; //may need to +1?
-    let result: RollResults = new RollResults(RetMap, total, max, min, avg);
-    if (result === undefined) {
+    let results: RollResults = ProcessRolls(ResultsMap);
+    if (results === undefined) {
         throw Error("result at the end of rollDice() was undefined")
     }
-    return result;
+    return results;
 }
 
-async function _executeRolls(count: number, sides: number): Promise<RollResults> {
-    const res = GenerateNumbers(1, sides, count);
+//should be safe to remove this function - #cleanup
+async function _executeRolls(count: number, sides: number): Promise<number[]| undefined> {
+    const res: Promise<number[] | undefined> = GenerateNumbers(1, sides, count);
     console.log("execRolls res " + res);
-    if (res !== undefined) {
-        return res;
-    }
-    throw Error("result at the end of rollDice() was undefined")
+    return GenerateNumbers(1, sides, count); //todo clean this up after I get async WORKING
+    // if (res !== undefined) {
+    //     return res;
+    // }
+    // throw Error("result at the end of rollDice() was undefined")
 
 }
 
-function _executeRoll(sides: number): number {
-
-    const myNum = 2
-    GenerateNumbers(1, 5, 1).then(results => {
-        console.log("generated numbers successful?" + results)
-        return results
-    }
-    )
-    // let myNum =
-    const result: number = 1 + Math.floor(Math.random() * sides)
-    console.log("you rolled a " + sides + " sided die and the result is: " + result);
-    return result; //has to return outside the then(){func}
-}
+// function _executeRoll(sides: number): number {
+//
+//     const myNum = 2
+//     GenerateNumbers(1, 5, 1).then(results => {
+//         console.log("generated numbers successful?" + results)
+//         return results
+//     }
+//     )
+//     // let myNum =
+//     const result: number = 1 + Math.floor(Math.random() * sides)
+//     console.log("you rolled a " + sides + " sided die and the result is: " + result);
+//     return result; //has to return outside the then(){func}
+// }
 
 //#endregion
