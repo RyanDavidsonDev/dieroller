@@ -7,8 +7,8 @@ import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
 //##region App
 function App() {
     const [results, setResults] = useState<RollResults>();
-
-    return (<>
+    return (
+        <>
             <div className="App">
                 <header className="App-header">
                     <header className="App-header__title">
@@ -34,13 +34,13 @@ function App() {
                     <DisplayResults results={results}></DisplayResults>
                 </div>
                 <div className="footer">
-          <span>
-             <a
-                 className="App-link"
-                 href={`${process.env.PUBLIC_URL}/credits.md`}
-                 target="_blank"
-                 rel="noopener noreferrer"
-             >Credits
+        <span>
+          <a
+              className="App-link"
+              href={`${process.env.PUBLIC_URL}/credits.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+          >Credits
             </a>
           </span>
                     <span>
@@ -161,7 +161,7 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
 
     const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
 
-    function handleRollMultiple(sides: number) {
+    async function handleClickMultiple(sides: number) {
         let count: number = 0;
         if (countRef?.current?.value !== undefined) {
             count = parseInt(countRef.current.value);
@@ -176,8 +176,23 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
         }
         if (count !== 0) {
 
-            onRoll(rollDice(count, sides));
+            onRoll( await rollDice(count, sides));
         }
+    }
+
+    async function handleClickSingle({sides, onRoll} : {sides: number; onRoll: Function}) {
+        try{
+            await rollDice(1, sides).then(results => {onRoll(results)});
+
+        } catch(err) {
+
+            if (err instanceof Error){
+                console.error("failed to submit request: " + err.message);
+            } else {
+                console.error("an unknown error occurred: " + err)
+            }
+        }
+
     }
 
     return (
@@ -187,16 +202,15 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
         </span>
             <button
                 className="diceTable__button"
-                onClick={() => onRoll(rollDice(1, sides))}>
+                onClick={ () =>handleClickSingle({sides, onRoll})}>
                 D{sides} </button>
             <span className="diceTable__label">
-           or roll multiple
-         </span>
+            or roll multiple
+        </span>
             <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
             <button
                 className="diceTable__button"
-                //todo why is the counter resetting on button press?
-                onClick={() => handleRollMultiple(sides)}>
+                onClick={ () =>handleClickMultiple(sides)}>
                 roll multiple
             </button>
         </div>
