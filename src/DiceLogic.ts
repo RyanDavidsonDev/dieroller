@@ -110,6 +110,7 @@ export async function rollDice(count: number, sides: number): Promise<RollResult
     if (results === undefined) {
         throw Error("result at the end of rollDice() was undefined")
     }
+    console.log("results were" + results);
     return results;
 }
 

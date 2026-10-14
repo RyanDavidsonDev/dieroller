@@ -1,4 +1,4 @@
-import React, {JSX, RefObject, useRef, useState} from 'react';
+import React, {ChangeEvent, JSX, RefObject, useRef, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
 import {Interface} from "node:readline";
@@ -42,19 +42,19 @@ function App() {
                         </div>
                         <div className="rollButtons__colContainer">
                             <div className="rollButtons__col">
-                                <DiceRow sides={4} onRoll={setResults}></DiceRow>
-                                <DiceRow sides={6} onRoll={setResults}></DiceRow>
-                                <DiceRow sides={8} onRoll={setResults}></DiceRow>
+                                <RollSingle sides={4} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={6} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={8} onRoll={setResults}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <DiceRow sides={10} onRoll={setResults}></DiceRow>
-                                <DiceRow sides={12} onRoll={setResults}></DiceRow>
-                                <DiceRow sides={20} onRoll={setResults}></DiceRow>
+                                <RollSingle sides={10} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={12} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={20} onRoll={setResults}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <DiceRow sides={2} onRoll={setResults} message={"Flip a"} buttonText={"coin"}></DiceRow>
-                                <DiceRow sides={99} onRoll={setResults}></DiceRow>
-                                <DiceRow sides={100} onRoll={setResults}></DiceRow>
+                                <RollSingle sides={2} onRoll={setResults} message={"Flip a "} buttonText={"coin"}></RollSingle>
+                                <RollSingle sides={99} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={100} onRoll={setResults}></RollSingle>
                             </div>
                         </div>
 
@@ -62,11 +62,13 @@ function App() {
                         <div className="rollButtons__header">
                             Or, roll multiple
                         </div>
-                        <div className="rollButtons__input">
-
-
-                        </div>
+                        <RollMultiple onRoll={setResults}></RollMultiple>
                     </div>
+
+
+                      <div className="Results">
+                          <DisplayResults results={results}></DisplayResults>
+                      </div>
                 </div>
             </div>
 
@@ -95,9 +97,6 @@ function App() {
           {/*              <DiceRow sides={20} onRoll={setResults}></DiceRow>*/}
           {/*              <DiceRow sides={100} onRoll={setResults}></DiceRow>*/}
           {/*          </div>*/}
-          {/*      </div>*/}
-          {/*      <div className="Results">*/}
-          {/*          <DisplayResults results={results}></DisplayResults>*/}
           {/*      </div>*/}
           {/*  </div>*/}
         </>
@@ -157,7 +156,7 @@ function App() {
                         <header className="Results-header__title">{results.total}</header>
                         <div className="Results-MoreContainer">
                             <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
-                            <header className="Results-moreResults">The average was {results.average}</header>
+                            <header className="Results-moreResults">The average was {Number(results.average.toPrecision(3))}</header>
                             <header className="Results-moreResults">The highest roll was {results.highest}</header>
 
                         </div>
@@ -213,7 +212,7 @@ interface DiceRowProps{
     buttonText?:string;
 }
 
-function DiceRow(props: DiceRowProps): JSX.Element {
+function RollSingle(props: DiceRowProps): JSX.Element {
     //set message and button text ; if we were passed non-default vals, use those, otherwise use default
     const message = (props.message === undefined ? "Roll a " : props.message) ;
     const buttonText = (props.buttonText === undefined ?( "D" + props.sides) : props.buttonText) ;
@@ -228,16 +227,11 @@ function DiceRow(props: DiceRowProps): JSX.Element {
         // props.message = "Roll A"
     }
 
-
-    interface handleClickProps{
-        sides: number;
-        onRoll: Function;
-    }
-    async function handleClickSingle({sides, onRoll}: { sides: number; onRoll: Function }) {
+    async function handleClickSingle(sides:number) {
     // async function handleClickSingle(props: handleClickProps) {
         try {
             await rollDice(1, sides).then(results => {
-                onRoll(results)
+                props.onRoll(results)
             });
 
         } catch (err) {
@@ -248,7 +242,6 @@ function DiceRow(props: DiceRowProps): JSX.Element {
                 console.error("an unknown error occurred: " + err)
             }
         }
-
     }
 
     return (
@@ -256,7 +249,7 @@ function DiceRow(props: DiceRowProps): JSX.Element {
             {message}
             <button
                 className="diceTable__button"
-                onClick={() => handleClickSingle({sides: props.sides, onRoll: props.onRoll})}>
+                onClick={() => handleClickSingle(props.sides)}>
                 {buttonText} </button>
 
         </div>
@@ -264,12 +257,18 @@ function DiceRow(props: DiceRowProps): JSX.Element {
 }
 // ttt save your work, then check out old commits to see what state I'd left handleclickMultipel in'
 
-function RollMultipleElement(props: DiceRowProps){
+function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
 
     const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+    // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+    const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
+    const [sides, setSides] = useState<number>(6);
 
-    async function handleClickMultiple(sides: number) {
-        let count: number = 0;
+    // let sides; //stored at this level so the return func can update the text when user selects coin
+
+
+    async function handleClickMultiple() {
+        let count: number;
         if (countRef?.current?.value !== undefined) {
             count = parseInt(countRef.current.value);
             if (isNaN(count)) {
@@ -280,21 +279,43 @@ function RollMultipleElement(props: DiceRowProps){
             }
             count = Math.max(1, count)
             count = Math.min(70, count)
+        } else {
+            throw new Error("CountRef is undefined")
         }
-        if (count !== 0) {
 
-            props.onRoll(await rollDice(count, sides));
+        if (count !== 0) {
+            console.log("rolling " + count + "d" + sides );
+
+            onRoll(await rollDice(count, sides));
         }
     }
 
+
+
     return (
         <>
-            or roll multiple
+
+            {sides ===2 ? "Flip": "Roll"}
             <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
+
+            <select value={sides} onChange={e=>setSides(Number(e.target.value))}>
+                <option value={2}>coins</option>
+                <option value={4}>d4</option>
+                <option value={6}>d6</option>
+                <option value={8}>d8</option>
+                <option value={10}>d10</option>
+                <option value={12}>d12</option>
+                <option value={20}>d20</option>
+                <option value={99}>d99</option>
+                <option value={100}>d100</option>
+            </select>
+
+            {/*<input ref={sidesRef} type={"number"} min={1} max={100} step={1}/>*/}
+            {" "}
             <button
                 className="diceTable__button"
-                onClick={() => handleClickMultiple(sides: props.sides, onRoll: props.onRoll)}>
-                roll multiple
+                onClick={() => handleClickMultiple()}>
+                roll
             </button>
         </>
     )
