@@ -90,6 +90,11 @@
 .Results-moreResults{
   font-size: 1.5rem;
 }
+.Results-MoreContainer{
+  display: flex;
+  flex-direction: row;
+  gap: 4rem;
+}
 
 .footer{
   position:fixed;

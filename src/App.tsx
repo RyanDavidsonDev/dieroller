@@ -12,7 +12,7 @@ function App() {
             <div className="App">
                 <header className="App-header">
                     <header className="App-header__title">
-                        Welcome
+                        True Random Dice Roller
                     </header>
                     <header className="App-header__subtitle">
                         Please click a button below to roll a die
@@ -37,7 +37,7 @@ function App() {
         <span>
           <a
               className="App-link"
-              href={`${process.env.PUBLIC_URL}/credits.md`}
+              href={`${process.env.PUBLIC_URL}/credits.html`}
               target="_blank"
               rel="noopener noreferrer"
           >Credits
@@ -109,9 +109,12 @@ function App() {
                         <header className="Results-header__subtitle">{StringifyPool(rollPoolOfCurrentSideType)}</header>
                         <header className="Results-header__subtitle">For a total of:</header>
                         <header className="Results-header__title">{results.total}</header>
-                        <header className="Results-moreResults">The highest roll was {results.highest}</header>
-                        <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
-                        <header className="Results-moreResults">The average was {results.average}</header>
+                        <div className="Results-MoreContainer">
+                            <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
+                            <header className="Results-moreResults">The average was {results.average}</header>
+                            <header className="Results-moreResults">The highest roll was {results.highest}</header>
+
+                        </div>
                         <header className="Results-moreResults"></header>
                     </div>
                 //###endregion
@@ -176,17 +179,19 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
         }
         if (count !== 0) {
 
-            onRoll( await rollDice(count, sides));
+            onRoll(await rollDice(count, sides));
         }
     }
 
-    async function handleClickSingle({sides, onRoll} : {sides: number; onRoll: Function}) {
-        try{
-            await rollDice(1, sides).then(results => {onRoll(results)});
+    async function handleClickSingle({sides, onRoll}: { sides: number; onRoll: Function }) {
+        try {
+            await rollDice(1, sides).then(results => {
+                onRoll(results)
+            });
 
-        } catch(err) {
+        } catch (err) {
 
-            if (err instanceof Error){
+            if (err instanceof Error) {
                 console.error("failed to submit request: " + err.message);
             } else {
                 console.error("an unknown error occurred: " + err)
@@ -202,7 +207,7 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
         </span>
             <button
                 className="diceTable__button"
-                onClick={ () =>handleClickSingle({sides, onRoll})}>
+                onClick={() => handleClickSingle({sides, onRoll})}>
                 D{sides} </button>
             <span className="diceTable__label">
             or roll multiple
@@ -210,7 +215,7 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
             <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
             <button
                 className="diceTable__button"
-                onClick={ () =>handleClickMultiple(sides)}>
+                onClick={() => handleClickMultiple(sides)}>
                 roll multiple
             </button>
         </div>
