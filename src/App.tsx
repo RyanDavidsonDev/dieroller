@@ -1,14 +1,14 @@
 import React, {JSX, RefObject, useRef, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
-// import {Interface} from "node:readline";
+import {Interface} from "node:readline";
 
 //#region visuals
 
 //##region App
 function App() {
     const [results, setResults] = useState<RollResults>();
-    const [history, setHistory] = useState<JSX.Element[]>([]);
+    const [history, setHistory] = useState<RollResults[]>([]);
     const [showHistory, setShowHistory] = useState<boolean>(false);
     // const prevHistory = history.slice(1).map(value =>{return value})
 
@@ -16,8 +16,7 @@ function App() {
         console.log("received roll, old results were " + results + " new is " +newResults);
         if(newResults !== undefined){
             setResults(newResults)
-            const newElement = ResultsToElement(newResults)
-            setHistory( [newElement, ...history])
+            setHistory( [newResults, ...history])
 
         } else {
             throw new Error("newResult was undefined");
@@ -86,7 +85,7 @@ function App() {
 
                         <div className="Results">
                             {/*history*/}
-                            {history[0]}
+                            <ResultToElement results={history[0]}></ResultToElement>
 
                             {/*<ResultsToElement results={results}></ResultsToElement>*/}
                             <div className="divider">
@@ -103,7 +102,7 @@ function App() {
     );
 //##endregion
 //## region DisplayResults
-    function ResultsToElement(results: RollResults) {
+    function ResultToElement({results} : {results: RollResults}): (JSX.Element){
         if (results === undefined || results?.resultsMap == null) {
             return <></>
         }
@@ -237,8 +236,8 @@ function App() {
         return <div className="history-container">
             {history.slice(1).map((value) => {
                 return <div className="history-item">
-                    {value}
-                    {/*<button className="RollAgain-button">Roll this again</button>*/}
+                    <ResultToElement results={value}></ResultToElement>
+                    <button className="RollAgain-button" onClick={()=>rollAgain({value, setResults})}>Roll this again</button>
                 </div>
             })}
             {/*{history.slice(1).map((value) => (return value))}*/}
@@ -254,6 +253,40 @@ interface DiceRowProps{
     message?:string;
     buttonText?:string;
 }
+
+async function rollAgain({results, onRoll} : {results:RollResults, onRoll: Function}) {
+    if(results.resultsMap.size === 0) {
+        throw new Error("roll results is empty");
+    } else {
+        const sides:number =results.resultsMap.keys().next().value;
+        const prevRolls =results.resultsMap.get(results.resultsMap.keys().next().value)
+
+        if(sides === undefined){
+            throw new Error("first element of rollResults (sides) is empty");
+        }
+        if(prevRolls=== undefined){
+            throw new Error("first element of rollResults (sides) is empty");
+        }
+        const numRolls = prevRolls.length;
+        if(numRolls ===0){
+            throw new Error("previous roll results results is empty");
+        }
+
+        try{
+            if(results.resultsMap.size === 1) {
+
+                await rollDice(numRolls, sides)
+                    .then(results => {
+                    onRoll(results)
+            }
+        } catch(e){
+            console.error(e);
+
+        }
+    }
+}
+
+
 
 function RollSingle(props: DiceRowProps): JSX.Element {
     //set message and button text ; if we were passed non-default vals, use those, otherwise use default
@@ -303,7 +336,7 @@ function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
 
     const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
     // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
-    // const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
+    const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
     const [sides, setSides] = useState<number>(6);
 
     // let sides; //stored at this level so the return func can update the text when user selects coin
