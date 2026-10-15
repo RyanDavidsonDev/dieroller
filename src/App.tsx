@@ -24,13 +24,6 @@ function App() {
         }
     }
 
-    function renderResults(): JSX.Element{
-        return(
-            <>
-                history[0]
-            </>
-        )
-    }
 
     return (
         <>
@@ -101,43 +94,11 @@ function App() {
                                     {showHistory? "Hide History" : "Show History"}
                                 </button>
                             </div>
-                            { showHistory? history.slice(1).map((value) => {return value}): null}
-                            {/*    .slice(1).map(value => {return value})}*/}
-                            {/*      <div className="Results">*/}
-                            {/*          <DisplayResults results={results}></DisplayResults>*/}
-                            {/*      </div>*/}
+                            <RenderHistory></RenderHistory>
                         </div>
 
                 </div>
             </div>
-
-
-          {/*  <div className="footer">*/}
-          {/*      <span>*/}
-          {/*            </span>*/}
-          {/*      <span>*/}
-
-          {/*</span>*/}
-          {/*  </div>*/}
-
-
-
-          {/*  <div className="App">*/}
-          {/*      <header className="App-header">*/}
-
-          {/*      </header>*/}
-          {/*      <div className="DiceTable">*/}
-          {/*          <div className="DiceTable">*/}
-          {/*              <DiceRow sides={4} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={6} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={8} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={10} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={12} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={20} onRoll={setResults}></DiceRow>*/}
-          {/*              <DiceRow sides={100} onRoll={setResults}></DiceRow>*/}
-          {/*          </div>*/}
-          {/*      </div>*/}
-          {/*  </div>*/}
         </>
     );
 //##endregion
@@ -239,6 +200,27 @@ function App() {
             //
         }
         return ret
+
+    }
+
+    // { showHistory? ): null}
+    function RenderHistory(): JSX.Element {
+        if(!showHistory) {
+            return <></>;
+        }
+        for( let i = 1; i< history.length; i++ ) {
+
+        }
+
+        return <div className="history-container">
+            {history.slice(1).map((value) => {
+                return <div className="history-item">
+                    {value}
+                    <button className="RollAgain-button">Roll this again</button>
+                </div>
+            })}
+            {/*{history.slice(1).map((value) => (return value))}*/}
+        </div>
     }
 
     //##endregion
@@ -294,7 +276,6 @@ function RollSingle(props: DiceRowProps): JSX.Element {
         </div>
     )
 }
-// ttt save your work, then check out old commits to see what state I'd left handleclickMultipel in'
 
 function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
 
@@ -328,8 +309,6 @@ function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
             onRoll(await rollDice(count, sides));
         }
     }
-
-
 
     return (
         <>
