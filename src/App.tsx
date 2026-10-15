@@ -1,64 +1,109 @@
 import React, {JSX, RefObject, useRef, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
+// import {Interface} from "node:readline";
 
 //#region visuals
 
 //##region App
 function App() {
     const [results, setResults] = useState<RollResults>();
+    const [history, setHistory] = useState<JSX.Element[]>([]);
+    const [showHistory, setShowHistory] = useState<boolean>(false);
+    // const prevHistory = history.slice(1).map(value =>{return value})
+
+    function handleRoll(newResults: RollResults) {
+        console.log("received roll, old results were " + results + " new is " +newResults);
+        if(newResults !== undefined){
+            setResults(newResults)
+            const newElement = ResultsToElement(newResults)
+            setHistory( [newElement, ...history])
+
+        } else {
+            throw new Error("newResult was undefined");
+        }
+    }
+
+
     return (
         <>
             <div className="App">
-                <header className="App-header">
-                    <header className="App-header__title">
-                        True Random Dice Roller
+                <div className="header">
+                    <header className="header__title">
+                        True Random Di(c)e Roller
                     </header>
-                    <header className="App-header__subtitle">
+                    {/*does this need to be a header?*/}
+                    <header className="header__subtitle">
                         Please click a button below to roll a die
                     </header>
-
-                </header>
-                <div className="DiceTable">
-                    <div className="DiceTable">
-                        <DiceRow sides={4} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={6} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={8} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={10} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={12} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={20} onRoll={setResults}></DiceRow>
-                        <DiceRow sides={100} onRoll={setResults}></DiceRow>
+                    <div className="divider">
+                        <a
+                            className="App-link"
+                            href={`${process.env.PUBLIC_URL}/credits.html`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >Credits
+                        </a>
+                        <a
+                            className="App-link"
+                            href="https://github.com/ryandavidsondev/dieroller"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >Github</a>
                     </div>
                 </div>
-                <div className="Results">
-                    <DisplayResults results={results}></DisplayResults>
-                </div>
-                <div className="footer">
-        <span>
-          <a
-              className="App-link"
-              href={`${process.env.PUBLIC_URL}/credits.html`}
-              target="_blank"
-              rel="noopener noreferrer"
-          >Credits
-            </a>
-          </span>
-                    <span>
-            <a
-                className="App-link"
-                href="https://github.com/ryandavidsondev/dieroller"
-                rel="noopener noreferrer"
-                target="_blank"
-            >Github</a>
+                <div className="main">
+                    <div className="rollButtons">
+                        <div className="rollButtons__header">
+                            Roll a single die of a particular type
+                        </div>
+                        <div className="rollButtons__colContainer">
+                            <div className="rollButtons__col">
+                                <RollSingle sides={4} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={6} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={8} onRoll={handleRoll}></RollSingle>
+                            </div>
+                            <div className="rollButtons__col">
+                                <RollSingle sides={10} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={12} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={20} onRoll={handleRoll}></RollSingle>
+                            </div>
+                            <div className="rollButtons__col">
+                                <RollSingle sides={2} onRoll={handleRoll} message={"Flip a "} buttonText={"coin"}></RollSingle>
+                                <RollSingle sides={99} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={100} onRoll={handleRoll}></RollSingle>
+                            </div>
+                        </div>
 
-          </span>
+
+
+                        <div className="rollButtons__header">
+                            Or, roll multiple
+                        </div>
+                        <RollMultiple onRoll={handleRoll}></RollMultiple>
+                    </div>
+
+
+                        <div className="Results">
+                            {/*history*/}
+                            {history[0]}
+
+                            {/*<ResultsToElement results={results}></ResultsToElement>*/}
+                            <div className="divider">
+                                <button className="showHistory" onClick={( ) =>{setShowHistory(!showHistory)}}>
+                                    {showHistory? "Hide History" : "Show History"}
+                                </button>
+                            </div>
+                            <RenderHistory></RenderHistory>
+                        </div>
+
                 </div>
             </div>
         </>
     );
 //##endregion
 //## region DisplayResults
-    function DisplayResults({results}: { results: RollResults | undefined }) {
+    function ResultsToElement(results: RollResults) {
         if (results === undefined || results?.resultsMap == null) {
             return <></>
         }
@@ -102,17 +147,39 @@ function App() {
                 //we only rolled one type of die, but multiple of them
                 ret =
                     <div className="Results-Container">
-                        <header className="Results-header__subtitle">you
+                        <header className="Results-text">you
                             rolled {results.resultsMap.get(currentSideType)?.length}d{results.resultsMap.keys().next().value} and
                             got:
                         </header>
-                        <header className="Results-header__subtitle">{StringifyPool(rollPoolOfCurrentSideType)}</header>
-                        <header className="Results-header__subtitle">For a total of:</header>
+                        <header className="Results-array">{StringifyPool(rollPoolOfCurrentSideType)}</header>
+                        <header className="Results-text">For a total of:</header>
                         <header className="Results-header__title">{results.total}</header>
                         <div className="Results-MoreContainer">
-                            <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
-                            <header className="Results-moreResults">The average was {results.average}</header>
-                            <header className="Results-moreResults">The highest roll was {results.highest}</header>
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    lowest
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {results.lowest}
+                                </div>
+                            </div>
+
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    average
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {Number(results.average.toPrecision(3))}
+                                </div>
+                            </div>
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    highest
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {results.highest}
+                                </div>
+                            </div>
 
                         </div>
                         <header className="Results-moreResults"></header>
@@ -155,38 +222,59 @@ function App() {
             //
         }
         return ret
+
+    }
+
+    // { showHistory? ): null}
+    function RenderHistory(): JSX.Element {
+        if(!showHistory) {
+            return <></>;
+        }
+        for( let i = 1; i< history.length; i++ ) {
+
+        }
+
+        return <div className="history-container">
+            {history.slice(1).map((value) => {
+                return <div className="history-item">
+                    {value}
+                    {/*<button className="RollAgain-button">Roll this again</button>*/}
+                </div>
+            })}
+            {/*{history.slice(1).map((value) => (return value))}*/}
+        </div>
     }
 
     //##endregion
 }
 
-function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults) => void }): JSX.Element {
+interface DiceRowProps{
+    sides: number;
+    onRoll: Function;
+    message?:string;
+    buttonText?:string;
+}
 
-    const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+function RollSingle(props: DiceRowProps): JSX.Element {
+    //set message and button text ; if we were passed non-default vals, use those, otherwise use default
+    const message = (props.message === undefined ? "Roll a " : props.message) ;
+    const buttonText = (props.buttonText === undefined ?( "D" + props.sides) : props.buttonText) ;
 
-    async function handleClickMultiple(sides: number) {
-        let count: number = 0;
-        if (countRef?.current?.value !== undefined) {
-            count = parseInt(countRef.current.value);
-            if (isNaN(count)) {
-                count = 1;
-                //future dev I'll want to properly fork this logic. probably return early
-                // if count is NaN. That'll allow me to step over each field and skip the ones
-                // that are empty. for now just turning an empty field should be fine
-            }
-            count = Math.max(1, count)
-            count = Math.min(70, count)
-        }
-        if (count !== 0) {
-
-            onRoll(await rollDice(count, sides));
-        }
+    if(props.message === undefined) {
+        props = {sides: props.sides, onRoll: props.onRoll, message:"Roll a"};
+        // props.message = "Roll A"
     }
 
-    async function handleClickSingle({sides, onRoll}: { sides: number; onRoll: Function }) {
+    if(props.buttonText === undefined) {
+        props = {sides: props.sides, onRoll: props.onRoll, message:"Roll a"};
+        // props.message = "Roll A"
+    }
+
+    async function handleClickSingle(sides:number) {
+    // async function handleClickSingle(props: handleClickProps) {
         try {
             await rollDice(1, sides).then(results => {
-                onRoll(results)
+                props.onRoll(results)
             });
 
         } catch (err) {
@@ -197,28 +285,79 @@ function DiceRow({sides, onRoll}: { sides: number; onRoll: (results: RollResults
                 console.error("an unknown error occurred: " + err)
             }
         }
-
     }
 
     return (
         <div className="diceTable__row">
-        <span className="diceTable__label">
-          Roll a D{sides}
-        </span>
+            {message}
             <button
                 className="diceTable__button"
-                onClick={() => handleClickSingle({sides, onRoll})}>
-                D{sides} </button>
-            <span className="diceTable__label">
-            or roll multiple
-        </span>
-            <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
-            <button
-                className="diceTable__button"
-                onClick={() => handleClickMultiple(sides)}>
-                roll multiple
-            </button>
+                onClick={() => handleClickSingle(props.sides)}>
+                {buttonText} </button>
+
         </div>
+    )
+}
+
+function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
+
+    const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+    // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+    // const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
+    const [sides, setSides] = useState<number>(6);
+
+    // let sides; //stored at this level so the return func can update the text when user selects coin
+
+
+    async function handleClickMultiple() {
+        let count: number;
+        if (countRef?.current?.value !== undefined) {
+            count = parseInt(countRef.current.value);
+            if (isNaN(count)) {
+                count = 1;
+                //future dev I'll want to properly fork this logic. probably return early
+                // if count is NaN. That'll allow me to step over each field and skip the ones
+                // that are empty. for now just turning an empty field should be fine
+            }
+            count = Math.max(1, count)
+            count = Math.min(70, count)
+        } else {
+            throw new Error("CountRef is undefined")
+        }
+
+        if (count !== 0) {
+            console.log("rolling " + count + "d" + sides );
+
+            onRoll(await rollDice(count, sides));
+        }
+    }
+
+    return (
+        <>
+
+            {sides ===2 ? "Flip": "Roll"}
+            <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
+
+            <select value={sides} onChange={e=>setSides(Number(e.target.value))}>
+                <option value={2}>coins</option>
+                <option value={4}>d4</option>
+                <option value={6}>d6</option>
+                <option value={8}>d8</option>
+                <option value={10}>d10</option>
+                <option value={12}>d12</option>
+                <option value={20}>d20</option>
+                <option value={99}>d99</option>
+                <option value={100}>d100</option>
+            </select>
+
+            {/*<input ref={sidesRef} type={"number"} min={1} max={100} step={1}/>*/}
+            {" "}
+            <button
+                className="diceTable__button"
+                onClick={() => handleClickMultiple()}>
+                roll
+            </button>
+        </>
     )
 }
 

@@ -15,31 +15,67 @@
 
 .App{
   text-align: center;
-  background-color: #282c34;
+  align-items: center;
+  /*background-color: #282c34;*/ /*old color, blueish black*/
+  background-color: #1E1E1E; /*old color, greenish black*/
   min-height: 100vh;
   /*font-size: calc(1 *(10px + 2vmin));*/
+  color: white;
   flex:1
 }
 
-.App-header {
+.header {
   display: flex;
   flex-direction: column;
   align-items: Center;
   justify-content: flex-start;
   font-size: 4rem;
-  color: white;
   /*padding: 2rem;*/
 }
-.App-header__title {
+.header__title {
   /*font-size: calc(1*(10px + 2vmin));*/
   align-items: flex-start;
-  padding-top: 2rem;
+  /*padding-top: 2rem;*/
 
 }
-.App-header__subtitle{
+.header__subtitle{
   font-size: calc(2rem);
-  padding: 1.4rem;
+  padding: 1rem;
 }
+.divider{
+  background-color: #373C37;
+  width:100%;
+  padding:.5rem;
+  gap:5rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.main{
+}
+
+.rollButtons{
+  align-items: center;
+  padding: 1rem;
+}.rollButtons__colContainer{
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}.rollButtons__col{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}.rollButtons__header{
+  font-size: 2rem
+}.multipleButtons__input{}
+
+/*<div className="rollButtons">*/
+/*<div className="singleButtons">*/
+/*<div className="singleButtons__colContainer">*/
+
 
 .DiceTable {
   /*background-color: #61dafb; /
@@ -51,6 +87,9 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+}
+.DiceTable__button{
+
 }
 .DiceTable__row{
   display: flex;
@@ -69,6 +108,12 @@
 /*}.App-content__diceTable__row__button{*/
 /*   flex-direction: column;*/
 
+.history-container{
+  display: flex;
+  flex-direction: column;
+  gap:3rem;
+}
+
 .Results{
   display: flex;
   flex-direction: column;
@@ -84,11 +129,18 @@
   align-items: flex-start;
   padding: 1rem;
 }
-.Results-header__subtitle{
-  font-size: 2rem;
+.Results-text{
+  font-size: 1.75rem;
+}
+.Results-array{
+  font-size: 2.5rem;
 }
 .Results-moreResults{
   font-size: 1.5rem;
+}.Results-moreResults__header{
+
+}.Results-moreResults__content{
+ font-size: 3rem;
 }
 .Results-MoreContainer{
   display: flex;
@@ -96,25 +148,6 @@
   gap: 4rem;
 }
 
-.footer{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  padding:.75rem;
-  box-sizing: border-box;
-  text-align: center;
-  color: white;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap:wrap;
-  gap:2rem
-
-  /*flex-direction: column-reverse;*/
-  /*align-items:end;*/
-}
 
 .App-link {
   /*color: #61dafb;*/ /*old color*/
