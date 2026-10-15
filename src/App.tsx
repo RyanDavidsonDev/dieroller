@@ -1,7 +1,7 @@
-import React, {ChangeEvent, JSX, RefObject, useRef, useState} from 'react';
+import React, {JSX, RefObject, useRef, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
-import {Interface} from "node:readline";
+// import {Interface} from "node:readline";
 
 //#region visuals
 
@@ -155,9 +155,31 @@ function App() {
                         <header className="Results-text">For a total of:</header>
                         <header className="Results-header__title">{results.total}</header>
                         <div className="Results-MoreContainer">
-                            <header className="Results-moreResults">The lowest roll was {results.lowest}</header>
-                            <header className="Results-moreResults">The average was {Number(results.average.toPrecision(3))}</header>
-                            <header className="Results-moreResults">The highest roll was {results.highest}</header>
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    lowest
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {results.lowest}
+                                </div>
+                            </div>
+
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    average
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {Number(results.average.toPrecision(3))}
+                                </div>
+                            </div>
+                            <div className="Results-moreResults">
+                                <div className="Results-moreResults__header">
+                                    highest
+                                </div>
+                                <div className="Results-moreResults__content">
+                                    {results.highest}
+                                </div>
+                            </div>
 
                         </div>
                         <header className="Results-moreResults"></header>
@@ -216,7 +238,7 @@ function App() {
             {history.slice(1).map((value) => {
                 return <div className="history-item">
                     {value}
-                    <button className="RollAgain-button">Roll this again</button>
+                    {/*<button className="RollAgain-button">Roll this again</button>*/}
                 </div>
             })}
             {/*{history.slice(1).map((value) => (return value))}*/}
@@ -281,7 +303,7 @@ function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
 
     const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
     // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
-    const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
+    // const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
     const [sides, setSides] = useState<number>(6);
 
     // let sides; //stored at this level so the return func can update the text when user selects coin
