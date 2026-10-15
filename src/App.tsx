@@ -8,6 +8,30 @@ import {Interface} from "node:readline";
 //##region App
 function App() {
     const [results, setResults] = useState<RollResults>();
+    const [history, setHistory] = useState<JSX.Element[]>([]);
+    const [showHistory, setShowHistory] = useState<boolean>(false);
+    // const prevHistory = history.slice(1).map(value =>{return value})
+
+    function handleRoll(newResults: RollResults) {
+        console.log("received roll, old results were " + results + " new is " +newResults);
+        if(newResults !== undefined){
+            setResults(newResults)
+            const newElement = ResultsToElement(newResults)
+            setHistory( [newElement, ...history])
+
+        } else {
+            throw new Error("newResult was undefined");
+        }
+    }
+
+    function renderResults(): JSX.Element{
+        return(
+            <>
+                history[0]
+            </>
+        )
+    }
+
     return (
         <>
             <div className="App">
@@ -19,7 +43,7 @@ function App() {
                     <header className="header__subtitle">
                         Please click a button below to roll a die
                     </header>
-                    <div className="header__footer">
+                    <div className="divider">
                         <a
                             className="App-link"
                             href={`${process.env.PUBLIC_URL}/credits.html`}
@@ -42,33 +66,48 @@ function App() {
                         </div>
                         <div className="rollButtons__colContainer">
                             <div className="rollButtons__col">
-                                <RollSingle sides={4} onRoll={setResults}></RollSingle>
-                                <RollSingle sides={6} onRoll={setResults}></RollSingle>
-                                <RollSingle sides={8} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={4} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={6} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={8} onRoll={handleRoll}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <RollSingle sides={10} onRoll={setResults}></RollSingle>
-                                <RollSingle sides={12} onRoll={setResults}></RollSingle>
-                                <RollSingle sides={20} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={10} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={12} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={20} onRoll={handleRoll}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <RollSingle sides={2} onRoll={setResults} message={"Flip a "} buttonText={"coin"}></RollSingle>
-                                <RollSingle sides={99} onRoll={setResults}></RollSingle>
-                                <RollSingle sides={100} onRoll={setResults}></RollSingle>
+                                <RollSingle sides={2} onRoll={handleRoll} message={"Flip a "} buttonText={"coin"}></RollSingle>
+                                <RollSingle sides={99} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={100} onRoll={handleRoll}></RollSingle>
                             </div>
                         </div>
+
 
 
                         <div className="rollButtons__header">
                             Or, roll multiple
                         </div>
-                        <RollMultiple onRoll={setResults}></RollMultiple>
+                        <RollMultiple onRoll={handleRoll}></RollMultiple>
                     </div>
 
 
-                      <div className="Results">
-                          <DisplayResults results={results}></DisplayResults>
-                      </div>
+                        <div className="Results">
+                            {/*history*/}
+                            {history[0]}
+
+                            {/*<ResultsToElement results={results}></ResultsToElement>*/}
+                            <div className="divider">
+                                <button className="showHistory" onClick={( ) =>{setShowHistory(!showHistory)}}>
+                                    {showHistory? "Hide History" : "Show History"}
+                                </button>
+                            </div>
+                            { showHistory? history.slice(1).map((value) => {return value}): null}
+                            {/*    .slice(1).map(value => {return value})}*/}
+                            {/*      <div className="Results">*/}
+                            {/*          <DisplayResults results={results}></DisplayResults>*/}
+                            {/*      </div>*/}
+                        </div>
+
                 </div>
             </div>
 
@@ -103,7 +142,7 @@ function App() {
     );
 //##endregion
 //## region DisplayResults
-    function DisplayResults({results}: { results: RollResults | undefined }) {
+    function ResultsToElement(results: RollResults) {
         if (results === undefined || results?.resultsMap == null) {
             return <></>
         }

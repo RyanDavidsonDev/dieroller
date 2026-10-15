@@ -42,7 +42,7 @@
   font-size: calc(2rem);
   padding: 1rem;
 }
-.header__footer{
+.divider{
   background-color: #373C37;
   width:100%;
   padding:.5rem;
