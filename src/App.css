@@ -35,7 +35,7 @@
 .header__title {
   /*font-size: calc(1*(10px + 2vmin));*/
   align-items: flex-start;
-  padding-top: 2rem;
+  /*padding-top: 2rem;*/
 
 }
 .header__subtitle{
@@ -108,6 +108,12 @@
 /*}.App-content__diceTable__row__button{*/
 /*   flex-direction: column;*/
 
+.history-container{
+  display: flex;
+  flex-direction: column;
+  gap:3rem;
+}
+
 .Results{
   display: flex;
   flex-direction: column;
@@ -131,6 +137,10 @@
 }
 .Results-moreResults{
   font-size: 1.5rem;
+}.Results-moreResults__header{
+
+}.Results-moreResults__content{
+ font-size: 3rem;
 }
 .Results-MoreContainer{
   display: flex;
