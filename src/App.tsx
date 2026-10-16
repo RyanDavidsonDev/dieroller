@@ -1,7 +1,7 @@
-import React, {ChangeEvent, JSX, RefObject, useRef, useState} from 'react';
+import React, {ChangeEvent, JSX, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
-import {Interface} from "node:readline";
+// import {Interface} from "node:readline";
 
 //#region visuals
 
@@ -9,14 +9,14 @@ import {Interface} from "node:readline";
 function App() {
     const [results, setResults] = useState<RollResults>();
     const [history, setHistory] = useState<RollResults[]>([]);
-    const [showHistory, setShowHistory] = useState<boolean>(false);
+    const [showHistory, setShowHistory] = useState<boolean>(true);
     // const prevHistory = history.slice(1).map(value =>{return value})
 
     function updateResults(newResults: RollResults) {
         console.log("received roll, old results were " + results + " new is " +newResults);
         if(newResults !== undefined){
             setResults(newResults)
-            const newElement = ResultToElement({results:newResults})
+            // const newElement = ResultToElement({results:newResults})
             setHistory( [newResults, ...history])
 
         } else {
@@ -212,7 +212,7 @@ function App() {
             // I just would have to figure out a good way of displaying it.
             // I guess one really simple method would be to just chain the current presentation method? But
             // I'm not even fully satisfied with that, and ideally I'd like to set up a table of some sort.
-            // having different rows for each die type and so on. Idk, there's a lot of options there.
+            // having different rows for each die type and so on. IDK, there's a lot of options there.
             // but I'm trying to avoid rabbit holes cause I want to submit to VVD as soon as possible
             // since I don't know how long the application will be up.
             // All that to say, VVD if you're reading this, here's some proof I also know how to manage
@@ -291,7 +291,7 @@ async function rollAgain({results, onResultsCalculated} : {results:RollResults, 
             throw new Error("previous roll results results is empty");
         }
 
-        handleClick({sides, count:numRolls, onResultsCalculated})
+        await handleClick({sides, count:numRolls, onResultsCalculated})
         //
         // try{
         //     if(results.resultsMap.size === 1) {
@@ -338,7 +338,7 @@ function RollSingle({
     // const message = (props.message === undefined ? "Roll a " : props.message) ;
     // const buttonText = (props.buttonText === undefined ?( "D" + props.sides) : props.buttonText) ;
     //I believe these default initializations are 'no longer necessary' as instead they're being
-    //handled more idomatically by destructuring the interface in handleClick()'s signature
+    //handled more idiomatically by destructuring the interface in handleClick()'s signature
     return (
         <div className="diceTable__row">
             {message}
@@ -353,7 +353,7 @@ function RollSingle({
 
 function RollMultiple({onResultsCalculated}: {onResultsCalculated: Function}): JSX.Element {
 
-    const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
+    // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
     const [sides, setSides] = useState<number>(6);
     const [count, setCount] = useState(1);
 
