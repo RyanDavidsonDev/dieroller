@@ -1,4 +1,4 @@
-import React, {JSX, RefObject, useRef, useState} from 'react';
+import React, {ChangeEvent, JSX, useState} from 'react';
 import './App.css';
 import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
 // import {Interface} from "node:readline";
@@ -8,16 +8,16 @@ import {rollDice, RollResults, StringifyPool} from "./DiceLogic";
 //##region App
 function App() {
     const [results, setResults] = useState<RollResults>();
-    const [history, setHistory] = useState<JSX.Element[]>([]);
-    const [showHistory, setShowHistory] = useState<boolean>(false);
+    const [history, setHistory] = useState<RollResults[]>([]);
+    const [showHistory, setShowHistory] = useState<boolean>(true);
     // const prevHistory = history.slice(1).map(value =>{return value})
 
-    function handleRoll(newResults: RollResults) {
+    function updateResults(newResults: RollResults) {
         console.log("received roll, old results were " + results + " new is " +newResults);
         if(newResults !== undefined){
             setResults(newResults)
-            const newElement = ResultsToElement(newResults)
-            setHistory( [newElement, ...history])
+            // const newElement = ResultToElement({results:newResults})
+            setHistory( [newResults, ...history])
 
         } else {
             throw new Error("newResult was undefined");
@@ -59,19 +59,20 @@ function App() {
                         </div>
                         <div className="rollButtons__colContainer">
                             <div className="rollButtons__col">
-                                <RollSingle sides={4} onRoll={handleRoll}></RollSingle>
-                                <RollSingle sides={6} onRoll={handleRoll}></RollSingle>
-                                <RollSingle sides={8} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={4} onResultsCalculated={updateResults}></RollSingle>
+                                <RollSingle sides={6} onResultsCalculated={updateResults}></RollSingle>
+                                <RollSingle sides={8} onResultsCalculated={updateResults}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <RollSingle sides={10} onRoll={handleRoll}></RollSingle>
-                                <RollSingle sides={12} onRoll={handleRoll}></RollSingle>
-                                <RollSingle sides={20} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={10} onResultsCalculated={updateResults}></RollSingle>
+                                <RollSingle sides={12} onResultsCalculated={updateResults}></RollSingle>
+                                <RollSingle sides={20} onResultsCalculated={updateResults}></RollSingle>
                             </div>
                             <div className="rollButtons__col">
-                                <RollSingle sides={2} onRoll={handleRoll} message={"Flip a "} buttonText={"coin"}></RollSingle>
-                                <RollSingle sides={99} onRoll={handleRoll}></RollSingle>
-                                <RollSingle sides={100} onRoll={handleRoll}></RollSingle>
+                                <RollSingle sides={2} onResultsCalculated={updateResults}
+                                            message={"Flip a "} buttonText={"coin"}></RollSingle>
+                                <RollSingle sides={99} onResultsCalculated={updateResults}></RollSingle>
+                                <RollSingle sides={100} onResultsCalculated={updateResults}></RollSingle>
                             </div>
                         </div>
 
@@ -80,17 +81,18 @@ function App() {
                         <div className="rollButtons__header">
                             Or, roll multiple
                         </div>
-                        <RollMultiple onRoll={handleRoll}></RollMultiple>
+                        <RollMultiple onResultsCalculated={updateResults}></RollMultiple>
                     </div>
 
 
                         <div className="Results">
                             {/*history*/}
-                            {history[0]}
+                            <ResultToElement results={history[0]}></ResultToElement>
 
                             {/*<ResultsToElement results={results}></ResultsToElement>*/}
                             <div className="divider">
-                                <button className="showHistory" onClick={( ) =>{setShowHistory(!showHistory)}}>
+                                <button className="showHistory" onClick={() =>{
+                                    setShowHistory(!showHistory)}}>
                                     {showHistory? "Hide History" : "Show History"}
                                 </button>
                             </div>
@@ -103,13 +105,14 @@ function App() {
     );
 //##endregion
 //## region DisplayResults
-    function ResultsToElement(results: RollResults) {
+    function ResultToElement({results} : {results: RollResults}): (JSX.Element){
         if (results === undefined || results?.resultsMap == null) {
             return <></>
         }
         let ret: React.JSX.Element = <></>;
         if (results.resultsMap.size === 0) {
-            throw new Error("somehow the length of AllResults is Zero despite the roll results being valid" +
+            throw new Error("somehow the length of AllResults is Zero despite the roll results " +
+                "being valid" +
                 "\n not sure how this happened but something is definitely wrong.");
         }
 
@@ -117,8 +120,9 @@ function App() {
         if (results.resultsMap.size === 1) {
 
             let currentSideType: number = results.resultsMap.keys().next().value;
+            console.log("cst is" + currentSideType)
             let rollPoolOfCurrentSideType = results.resultsMap.get(currentSideType);
-
+            const resultAsNum = results.resultsMap.values().next().value
             if (rollPoolOfCurrentSideType === undefined) {
                 throw new Error("roll pool of current side types is invalid");
             }
@@ -127,17 +131,22 @@ function App() {
 
                 //###region OneDie
             } else if (rollPoolOfCurrentSideType.length === 1) {
-                //we only rolled one singular die, so this will be the absolute simplest possible display
+            //we only rolled one singular die, so this will be the absolute simplest possible display
+                const isCoin:boolean = currentSideType === 2
 
                 ret =
                     <div className="Results-Container">
 
-                        <header className="Results-header__subtitle">you rolled a
-                            d{results.resultsMap.keys().next().value} and got:
+                        <header className="Results-caption">
+                            You {(isCoin? "flipped" : "rolled")} a
+                            {(isCoin? " coin" : " D" + currentSideType+ " ")} and got:
+
                         </header>
                         <header
-                            className="Results-header__title">        {/*^ equivalent to resultsMap.keys()[0]. has to be done this way because keys() is an iterator  */}
-                            {results.resultsMap.values().next().value}
+                            className="Results-largeText">
+                            {(isCoin?
+                                (resultAsNum ===1? "Heads": "Tails")
+                            :resultAsNum )}
                         </header>
                     </div>
                 //###endregion
@@ -147,42 +156,43 @@ function App() {
                 //we only rolled one type of die, but multiple of them
                 ret =
                     <div className="Results-Container">
-                        <header className="Results-text">you
-                            rolled {results.resultsMap.get(currentSideType)?.length}d{results.resultsMap.keys().next().value} and
-                            got:
+                        <header className="Results-caption">you
+                            rolled {results.resultsMap.get(
+                                currentSideType)?.length}d{results.resultsMap.keys().next().value + " "}
+                            and got:
                         </header>
-                        <header className="Results-array">{StringifyPool(rollPoolOfCurrentSideType)}</header>
-                        <header className="Results-text">For a total of:</header>
-                        <header className="Results-header__title">{results.total}</header>
+                        <header className="Results-array">
+                            {StringifyPool(rollPoolOfCurrentSideType)}</header>
+                        <header className="Results-caption">For a total of:</header>
+                        <header className="Results-largeText">{results.total}</header>
                         <div className="Results-MoreContainer">
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     lowest
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {results.lowest}
                                 </div>
                             </div>
 
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     average
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {Number(results.average.toPrecision(3))}
                                 </div>
                             </div>
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     highest
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {results.highest}
                                 </div>
                             </div>
 
                         </div>
-                        <header className="Results-moreResults"></header>
                     </div>
                 //###endregion
             }
@@ -200,7 +210,7 @@ function App() {
             // I just would have to figure out a good way of displaying it.
             // I guess one really simple method would be to just chain the current presentation method? But
             // I'm not even fully satisfied with that, and ideally I'd like to set up a table of some sort.
-            // having different rows for each die type and so on. Idk, there's a lot of options there.
+            // having different rows for each die type and so on. IDK, there's a lot of options there.
             // but I'm trying to avoid rabbit holes cause I want to submit to VVD as soon as possible
             // since I don't know how long the application will be up.
             // All that to say, VVD if you're reading this, here's some proof I also know how to manage
@@ -235,13 +245,17 @@ function App() {
         }
 
         return <div className="history-container">
-            {history.slice(1).map((value) => {
+            {history.slice(1).map((value: RollResults)  => {
                 return <div className="history-item">
-                    {value}
-                    {/*<button className="RollAgain-button">Roll this again</button>*/}
+                    <ResultToElement results={value}></ResultToElement>
+                    {/*onClick={() => handleClick({sides, count:1, onResultsCalculated})}>*/}
+
+                    <button className="RollAgain-button" onClick={()=>rollAgain({
+                        results:value, onResultsCalculated:(() => updateResults(value))
+                    })}>
+                        Roll <br/> again</button>
                 </div>
             })}
-            {/*{history.slice(1).map((value) => (return value))}*/}
         </div>
     }
 
@@ -250,93 +264,122 @@ function App() {
 
 interface DiceRowProps{
     sides: number;
-    onRoll: Function;
+    count?: number
+    onResultsCalculated: Function;
     message?:string;
     buttonText?:string;
 }
 
-function RollSingle(props: DiceRowProps): JSX.Element {
-    //set message and button text ; if we were passed non-default vals, use those, otherwise use default
-    const message = (props.message === undefined ? "Roll a " : props.message) ;
-    const buttonText = (props.buttonText === undefined ?( "D" + props.sides) : props.buttonText) ;
 
-    if(props.message === undefined) {
-        props = {sides: props.sides, onRoll: props.onRoll, message:"Roll a"};
-        // props.message = "Roll A"
+async function rollAgain({results, onResultsCalculated} : {results:RollResults, onResultsCalculated: Function}) {
+    if(results.resultsMap.size === 0) {
+        throw new Error("roll results is empty");
+    } else {
+        const sides:number =results.resultsMap.keys().next().value;
+        const prevRolls =results.resultsMap.get(results.resultsMap.keys().next().value)
+
+        if(sides === undefined){
+            throw new Error("first element of rollResults (sides) is empty");
+        }
+        if(prevRolls=== undefined){
+            throw new Error("first element of rollResults (sides) is empty");
+        }
+        const numRolls:number = prevRolls.length;
+        if(numRolls ===0){
+            throw new Error("previous roll results results is empty");
+        }
+
+        await handleClick({sides, count:numRolls, onResultsCalculated})
+        //
+        // try{
+        //     if(results.resultsMap.size === 1) {
+        //
+        //         await rollDice(numRolls, sides)
+        //             // .then(results => {
+        //             // onRoll(results)}
+        //     }
+        // } catch(e){
+        //     console.error(e);
+        //
+        // }
     }
+}
 
-    if(props.buttonText === undefined) {
-        props = {sides: props.sides, onRoll: props.onRoll, message:"Roll a"};
-        // props.message = "Roll A"
-    }
+async function handleClick ({sides, count, onResultsCalculated} :
+                            {sides:number, count:number, onResultsCalculated: Function}) {
 
-    async function handleClickSingle(sides:number) {
-    // async function handleClickSingle(props: handleClickProps) {
-        try {
-            await rollDice(1, sides).then(results => {
-                props.onRoll(results)
-            });
 
-        } catch (err) {
+    try {
+        await rollDice(count, sides).then(results => {
+            onResultsCalculated(results)
+        });
 
-            if (err instanceof Error) {
-                console.error("failed to submit request: " + err.message);
-            } else {
-                console.error("an unknown error occurred: " + err)
-            }
+    } catch (err) {
+
+        if (err instanceof Error) {
+            console.error("failed to submit request: " + err.message);
+        } else {
+            console.error("an unknown error occurred: " + err)
         }
     }
+}
 
+
+
+function RollSingle({
+                        sides,
+                        onResultsCalculated,
+                        message = (sides === 2 ? "flip a " : "Roll a "),
+                        buttonText = ("D" + sides),
+                    }: DiceRowProps): JSX.Element {
+    //set message and button text ; if we were passed non-default vals, use those, otherwise use default
+    // const message = (props.message === undefined ? "Roll a " : props.message) ;
+    // const buttonText = (props.buttonText === undefined ?( "D" + props.sides) : props.buttonText) ;
+    //I believe these default initializations are 'no longer necessary' as instead they're being
+    //handled more idiomatically by destructuring the interface in handleClick()'s signature
     return (
         <div className="diceTable__row">
             {message}
             <button
                 className="diceTable__button"
-                onClick={() => handleClickSingle(props.sides)}>
+                onClick={() => handleClick({sides, count:1, onResultsCalculated})}>
                 {buttonText} </button>
 
         </div>
     )
 }
 
-function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
+function RollMultiple({onResultsCalculated}: {onResultsCalculated: Function}): JSX.Element {
 
-    const countRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
     // const sidesRef: (RefObject<HTMLInputElement | null> | null) = useRef<HTMLInputElement>(null);
-    // const sidesRef : (RefObject<HTMLSelectElement | null> | null) = useRef<HTMLSelectElement>(null);
     const [sides, setSides] = useState<number>(6);
-
-    // let sides; //stored at this level so the return func can update the text when user selects coin
-
-
-    async function handleClickMultiple() {
-        let count: number;
-        if (countRef?.current?.value !== undefined) {
-            count = parseInt(countRef.current.value);
-            if (isNaN(count)) {
-                count = 1;
-                //future dev I'll want to properly fork this logic. probably return early
-                // if count is NaN. That'll allow me to step over each field and skip the ones
-                // that are empty. for now just turning an empty field should be fine
-            }
-            count = Math.max(1, count)
-            count = Math.min(70, count)
-        } else {
-            throw new Error("CountRef is undefined")
-        }
-
-        if (count !== 0) {
-            console.log("rolling " + count + "d" + sides );
-
-            onRoll(await rollDice(count, sides));
-        }
-    }
+    const [count, setCount] = useState(1);
 
     return (
         <>
 
             {sides ===2 ? "Flip": "Roll"}
-            <input ref={countRef} type={"number"} min={1} max={70} step={1}/>
+            <input type={"number"} min={1} max={70} step={1} onChange={(value:ChangeEvent<HTMLInputElement>)=>{
+                const newVal = value.target.value
+
+                console.log("changing count to " + value.target.value);
+                let newValNum = parseInt(newVal);
+
+                //feels like a non-idiomatic way of catching this issue #cleanup
+                if (isNaN(newValNum)) {
+                    newValNum = 1;
+                    //future dev I'll want to properly fork this logic. probably return early
+                    // if count is NaN. That'll allow me to step over each field and skip the ones
+                    // that are empty. for now just turning an empty field should be fine
+                }
+                newValNum = Math.max(1, newValNum)
+                newValNum = Math.min(70, newValNum)
+
+                setCount(newValNum);
+            }
+
+
+            }/>
 
             <select value={sides} onChange={e=>setSides(Number(e.target.value))}>
                 <option value={2}>coins</option>
@@ -350,11 +393,11 @@ function RollMultiple({onRoll} : {onRoll:Function}): JSX.Element{
                 <option value={100}>d100</option>
             </select>
 
-            {/*<input ref={sidesRef} type={"number"} min={1} max={100} step={1}/>*/}
             {" "}
             <button
                 className="diceTable__button"
-                onClick={() => handleClickMultiple()}>
+                onClick={() => handleClick({sides,
+                    count, onResultsCalculated })}>
                 roll
             </button>
         </>
