@@ -139,13 +139,13 @@ function App() {
                 ret =
                     <div className="Results-Container">
 
-                        <header className="Results-header__subtitle">
+                        <header className="Results-caption">
                             You {(isCoin? "flipped" : "rolled")} a
                             {(isCoin? " coin" : " D" + currentSideType+ " ")} and got:
 
                         </header>
                         <header
-                            className="Results-header__title">
+                            className="Results-largeText">
                             {(isCoin?
                                 (resultAsNum ==1? "Heads": "Tails")
                             :resultAsNum )}
@@ -158,44 +158,43 @@ function App() {
                 //we only rolled one type of die, but multiple of them
                 ret =
                     <div className="Results-Container">
-                        <header className="Results-text">you
+                        <header className="Results-caption">you
                             rolled {results.resultsMap.get(
                                 currentSideType)?.length}d{results.resultsMap.keys().next().value + " "}
                             and got:
                         </header>
                         <header className="Results-array">
                             {StringifyPool(rollPoolOfCurrentSideType)}</header>
-                        <header className="Results-text">For a total of:</header>
-                        <header className="Results-header__title">{results.total}</header>
+                        <header className="Results-caption">For a total of:</header>
+                        <header className="Results-largeText">{results.total}</header>
                         <div className="Results-MoreContainer">
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     lowest
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {results.lowest}
                                 </div>
                             </div>
 
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     average
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {Number(results.average.toPrecision(3))}
                                 </div>
                             </div>
                             <div className="Results-moreResults">
-                                <div className="Results-moreResults__header">
+                                <div className="Results-caption">
                                     highest
                                 </div>
-                                <div className="Results-moreResults__content">
+                                <div className="Results-medText">
                                     {results.highest}
                                 </div>
                             </div>
 
                         </div>
-                        <header className="Results-moreResults"></header>
                     </div>
                 //###endregion
             }
@@ -253,8 +252,10 @@ function App() {
                     <ResultToElement results={value}></ResultToElement>
                     {/*onClick={() => handleClick({sides, count:1, onResultsCalculated})}>*/}
 
-                    <button className="RollAgain-button" onClick={()=>rollAgain({results:value, onResultsCalculated:(() => updateResults(value))})
-                    }>Roll this again</button>
+                    <button className="RollAgain-button" onClick={()=>rollAgain({
+                        results:value, onResultsCalculated:(() => updateResults(value))
+                    })}>
+                        Roll <br/> again</button>
                 </div>
             })}
         </div>
