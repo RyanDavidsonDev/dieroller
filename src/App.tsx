@@ -141,7 +141,7 @@ function App() {
 
                         <header className="Results-header__subtitle">
                             You {(isCoin? "flipped" : "rolled")} a
-                            {(isCoin? "coin" : "D" + currentSideType)} and got:
+                            {(isCoin? " coin" : " D" + currentSideType+ " ")} and got:
 
                         </header>
                         <header
@@ -160,7 +160,7 @@ function App() {
                     <div className="Results-Container">
                         <header className="Results-text">you
                             rolled {results.resultsMap.get(
-                                currentSideType)?.length}d{results.resultsMap.keys().next().value}
+                                currentSideType)?.length}d{results.resultsMap.keys().next().value + " "}
                             and got:
                         </header>
                         <header className="Results-array">
