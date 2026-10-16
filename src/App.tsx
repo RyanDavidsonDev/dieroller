@@ -120,10 +120,11 @@ function App() {
         if (results.resultsMap.size === 1) {
 
             let currentSideType: number = results.resultsMap.keys().next().value;
+                                   {/*^ equiv. to resultsMap.keys()[0] -
+                                    has to be done this way because keys() is an iterator (not array)*/}
             console.log("cst is" + currentSideType)
             let rollPoolOfCurrentSideType = results.resultsMap.get(currentSideType);
             const resultAsNum = results.resultsMap.values().next().value
-
             if (rollPoolOfCurrentSideType === undefined) {
                 throw new Error("roll pool of current side types is invalid");
             }
@@ -134,19 +135,17 @@ function App() {
             } else if (rollPoolOfCurrentSideType.length === 1) {
             //we only rolled one singular die, so this will be the absolute simplest possible display
                 const isCoin:boolean = currentSideType === 2
-                // const rolledOrFlipped:string =
-                // const dieTypeNum: number =
-                // const dieTypeString : string = ( d{}):
 
                 ret =
                     <div className="Results-Container">
 
                         <header className="Results-header__subtitle">
-                            You {(isCoin? "flipped" : "rolled")} a {(isCoin? "coin" : "D" + currentSideType)} and got:
+                            You {(isCoin? "flipped" : "rolled")} a
+                            {(isCoin? "coin" : "D" + currentSideType)} and got:
 
                         </header>
                         <header
-                            className="Results-header__title">        {/*^ equivalent to resultsMap.keys()[0]. has to be done this way because keys() is an iterator  */}
+                            className="Results-header__title">
                             {(isCoin?
                                 (resultAsNum ==1? "Heads": "Tails")
                             :resultAsNum )}
@@ -249,13 +248,15 @@ function App() {
         }
 
         return <div className="history-container">
-            {history.slice(1).map((value) => {
+            {history.slice(1).map((value: RollResults)  => {
                 return <div className="history-item">
                     <ResultToElement results={value}></ResultToElement>
-                    {/*<button className="RollAgain-button" onClick={()=>rollAgain({value, setResults})}>Roll this again</button>*/}
+                    {/*onClick={() => handleClick({sides, count:1, onResultsCalculated})}>*/}
+
+                    <button className="RollAgain-button" onClick={()=>rollAgain({results:value, onResultsCalculated:(() => updateResults(value))})
+                    }>Roll this again</button>
                 </div>
             })}
-            {/*{history.slice(1).map((value) => (return value))}*/}
         </div>
     }
 
@@ -270,7 +271,8 @@ interface DiceRowProps{
     buttonText?:string;
 }
 
-async function rollAgain({results, onRoll} : {results:RollResults, onRoll: Function}) {
+
+async function rollAgain({results, onResultsCalculated} : {results:RollResults, onResultsCalculated: Function}) {
     if(results.resultsMap.size === 0) {
         throw new Error("roll results is empty");
     } else {
@@ -283,43 +285,29 @@ async function rollAgain({results, onRoll} : {results:RollResults, onRoll: Funct
         if(prevRolls=== undefined){
             throw new Error("first element of rollResults (sides) is empty");
         }
-        const numRolls = prevRolls.length;
+        const numRolls:number = prevRolls.length;
         if(numRolls ===0){
             throw new Error("previous roll results results is empty");
         }
 
-        try{
-            if(results.resultsMap.size === 1) {
-
-                await rollDice(numRolls, sides)
-                    // .then(results => {
-                    // onRoll(results)}
-            }
-        } catch(e){
-            console.error(e);
-
-        }
+        handleClick({sides, count:numRolls, onResultsCalculated})
+        //
+        // try{
+        //     if(results.resultsMap.size === 1) {
+        //
+        //         await rollDice(numRolls, sides)
+        //             // .then(results => {
+        //             // onRoll(results)}
+        //     }
+        // } catch(e){
+        //     console.error(e);
+        //
+        // }
     }
 }
 
-async function handleClick ({sides, count, onResultsCalculated} :{sides:number, count:number, onResultsCalculated: Function}) {
-
-    //if count isn't defined, then this func is (probably) being called with the intent
-    // to roll multiple . so try to get the countRef and set it from there
-
-
-    // //init message and buttontext with default vals if they weren't passed vals
-    // if(message === undefined) {
-    //     props.message = (props.count === 1 ? "Roll A" : "Roll ${props.count}d${props.sides}");
-    //     // props.message = "Roll A"
-    // }
-    //
-    // if(props.buttonText === undefined) {
-    //     props.buttonText = ("D" + props.sides);
-    // }
-    //
-    // props.count = (props.count ===undefined? 1: props.count);
-    console.log("received")
+async function handleClick ({sides, count, onResultsCalculated} :
+                            {sides:number, count:number, onResultsCalculated: Function}) {
 
 
     try {
@@ -368,57 +356,6 @@ function RollMultiple({onResultsCalculated}: {onResultsCalculated: Function}): J
     const [sides, setSides] = useState<number>(6);
     const [count, setCount] = useState(1);
 
-    // let sides; //stored at this level so the return func can update the text when user selects coin
-
-    // async function handleClickMultiple() {
-    //     let count: number;
-    //     if (countRef?.current?.value !== undefined) {
-    //         count = parseInt(countRef.current.value);
-    //         if (isNaN(count)) {
-    //             count = 1;
-    //             //future dev I'll want to properly fork this logic. probably return early
-    //             // if count is NaN. That'll allow me to step over each field and skip the ones
-    //             // that are empty. for now just turning an empty field should be fine
-    //         }
-    //         count = Math.max(1, count)
-    //         count = Math.min(70, count)
-    //     } else {
-    //         throw new Error("CountRef is undefined")
-    //     }
-    //
-    //     if (count !== 0) {
-    //         console.log("rolling " + count + "d" + sides );
-    //
-    //         onRoll(await rollDice(count, sides));
-    //     }
-    // }
-
-    //assembles the arguments to roll multiple dice
-    //must be done as separate function from handleClick because it requires accessing members
-    // async function handleClickMultiple() {
-    //     let count: number;
-    //     if (countRef?.current?.value !== undefined) {
-    //         count = parseInt(countRef.current.value);
-    //         if (isNaN(count)) {
-    //             count = 1;
-    //             //future dev I'll want to properly fork this logic. probably return early
-    //             // if count is NaN. That'll allow me to step over each field and skip the ones
-    //             // that are empty. for now just turning an empty field should be fine
-    //         }
-    //         count = Math.max(1, count)
-    //         count = Math.min(70, count)
-    //     } else {
-    //         throw new Error("CountRef is undefined")
-    //     }
-    //
-    //     if (count !== 0) {
-    //         console.log("rolling " + count + "d" + sides );
-    //
-    //         onRoll(await rollDice(count, sides));
-    //     }
-    // }
-
-
     return (
         <>
 
@@ -457,7 +394,6 @@ function RollMultiple({onResultsCalculated}: {onResultsCalculated: Function}): J
                 <option value={100}>d100</option>
             </select>
 
-            {/*<input ref={sidesRef} type={"number"} min={1} max={100} step={1}/>*/}
             {" "}
             <button
                 className="diceTable__button"
